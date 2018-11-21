@@ -3,7 +3,7 @@
 # Created by   :	Esmarra
 # Creation Date:	20/11/2018
 # Rework date entries:
-#
+# 		17/07/2018 : db_query refined
 # Program Objectives:
 # Observations:
 # Special Thanks:
@@ -30,8 +30,13 @@ def register():
 	edit=input(">Are you an editor?(y/n):")
 	if edit=="y":
 		user_level="admin"
-	register_user(name,user,password,edit)
 
+	if(register_user(name,user,password,edit)==False):
+		cls()
+		print(" That Username is arleady Taken please try again")
+	else:
+		cls()
+		print(" Success, Welcome %s"%user)
 # User Login
 def login():
 	cls();

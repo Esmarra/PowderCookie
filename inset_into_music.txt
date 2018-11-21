@@ -1,0 +1,2 @@
+insert into musica (nome, genero,letra, tempo_da_musica, compositor_compositor_id,album_album_id,autor_autor_id)
+values ('Thunderstruck', 'Rock',null,'00:03:04',1,null,1);
