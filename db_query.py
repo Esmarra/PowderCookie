@@ -9,6 +9,12 @@ db_pwd = ""
 db_name = "basedados"
 db_port = "" # 3306
 
+def db_fetch(query):
+	db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
+	cursor = db.cursor()
+	cursor.execute(query)
+	return cursor.fetchone()
+
 # Get User From DB and compare with program login
 def get_user(user,password,type):
 	value = False
@@ -38,7 +44,8 @@ def get_user(user,password,type):
 			db.close()
 			
 	return value
-	
+
+# Register User in DB also checks if username is duplicate
 def register_user(name,user,password,edit):
 	#Check for Duplicate Username
 	if get_user(user,password,"r") == True:
@@ -60,3 +67,13 @@ def register_user(name,user,password,edit):
 		if db is not None:
 			db.close()
 	return value
+	
+#Get Usr_lvl
+def user_lvl(user):
+	db = None
+	db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
+	cursor = db.cursor()
+	sql="SELECT user_level FROM utilizador WHERE username = '%s'"%user
+	cursor.execute(sql)
+	result = cursor.fetchone()
+	return(result[0])
