@@ -65,8 +65,10 @@ def login():
 			register()
 
 # Add Music
-# def add_music():
-	# if()
+def add_music():
+	nome_autor=input(">Type Music Author:")
+	#VEREFY IF AUTHOR EXISTS
+	nome_musica=input(">Type Music Name:")
 	
 
 # Pre Clean Up

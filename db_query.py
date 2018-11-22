@@ -77,3 +77,13 @@ def user_lvl(user):
 	cursor.execute(sql)
 	result = cursor.fetchone()
 	return(result[0])
+
+#Check Author
+def autor_check(autor):
+	db = None
+	db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
+	cursor = db.cursor()
+	sql="SELECT autor_id FROM autor WHERE nome = '%s'"%autor
+	cursor.execute(sql)
+	result = cursor.fetchone()
+	return(result[0])
