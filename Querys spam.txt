@@ -1,0 +1,2 @@
+ALTER TABLE `musica` CHANGE `tempo_da_musica` `tempo_da_musica` TIME NULL DEFAULT NULL;
+ALTER TABLE `album` CHANGE `autor_autor_id` `autor_id` BIGINT(20) NOT NULL;
