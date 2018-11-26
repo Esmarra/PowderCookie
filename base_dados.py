@@ -201,21 +201,17 @@ def user_menu():
 			print ("""	_______________________________
 	User: %s
 		 
-		+-------------+
-		| 1.Login     |
-		+-------------+
-		| 2.Register  |
-		+-------------+
-		| 3.Add Music |
-		+-------------+
-		| 4.Logout    |
-		+-------------+
-		| q.Exit      |
-		+-------------+
+		+------------------+
+		| 1.Search Music   |
+		+------------------+
+		| 2.Search Author  |
+		+------------------+
+		| q.Exit           |
+		+------------------+
 	Version: %s
 	_______________________________
 			"""%(user,version))
-			ans=input(">Please select an option: ")
+			ans=input("> Please select an option: ")
 			if ans=="1":
 				login();
 			elif ans=="2":
@@ -264,7 +260,7 @@ def editor_menu():
 	Version: %s
 	_______________________________
 			"""%(user,version))
-			ans=input(">Please select an option: ")
+			ans=input("> Please select an option: ")
 			if ans=="1":
 				login();
 			elif ans=="2":
