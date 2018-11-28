@@ -1,0 +1,228 @@
+--//________ Aula 1 ________//--
+--//==== Ex 1 ====//--
+select * from dep;
+--//==== Ex 2 ====//--
+select nome ,funcao,sal,ndep from emp;
+--//==== Ex 3 ====//--
+select nome,ndep,sal from emp
+where sal > 150000 and sal < 300000;
+--//==== Ex 4 ====//--
+select * from dep
+order by ndep desc;
+--//==== Ex 5 ====//--
+select funcao from emp group by funcao;
+--ou select DISTINCT duncao from emp;
+--//==== Ex 6 ====//--
+select nome, funcao , premios from emp where premios >=0;
+--//==== Ex 7 ====//--
+select * from emp where ndep = 10 or ndep = 30;
+--//==== Ex 8 ====//--
+select Nome from emp where ndep = 20 and lower(funcao) ='analista' ;
+--//==== Ex 9 ====//--
+select nome,funcao from emp 
+where lower(nome) like '%v%' or lower(nome) like '%u%';
+--//==== Ex 10 ====//--
+select nome,funcao from emp 
+where lower(nome) like 'a%' and nome like '%us%' or nome like 'R%' and nome like '%ei%';
+--//==== Ex 11 ====//--
+select nome,funcao, (sal*12) + nvl(premios,0) "Renumeração Anual" from emp;
+--//==== Ex 12 ====//--
+select nome, (sal*12 + nvl(premios,0))*0.1 "10% Sal Anual" from emp;
+
+--//________ Aula 2 ________//--
+--//==== Ex 1 ====//-- pag46
+select e.nome,e.funcao,d.nome "DEPARTAMENTO"
+from emp e,dep d
+where e.ndep = d.ndep
+order by d.nome,e.nome;
+--//==== Ex 2 ====//--
+select e.nome, e.sal, e.ndep, d.nome "DEPARTAMENTO"
+from emp e,dep d
+where e.ndep = d.ndep
+and e.nome like 'A%' and e.nome like '%R%';
+--//==== Ex 3 ====//--
+select e.nome, e.sal,d.nome "DEPARTAMENTO",d.local
+from emp e,dep d
+where e.ndep = d.ndep
+and e.sal < 150000;
+--//==== Ex 4 ====//--
+select DISTINCT des.escalao,e.funcao
+from descontos des,emp e
+where e.sal BETWEEN des.salinf and des.salsup
+group by des.escalao,e.funcao
+order by des.escalao;
+--//==== Ex 5 ====//--
+select  e.nome ,e.funcao ,e.sal
+from emp e,descontos d
+where (e.sal BETWEEN d.salinf and d.salsup)
+and d.escalao = 4
+order by e.nome,e.funcao,e.sal;
+--//==== Ex 6 ====//--
+select e.nome ,e.funcao ,e.sal ,dep.nome "DEPARTAMENTO"
+from emp e,descontos d,dep
+where (e.sal BETWEEN d.salinf and d.salsup)
+and d.escalao = 4
+and e.ndep=dep.ndep
+order by e.nome,e.funcao,e.sal;
+--//==== Ex 7 ====//--
+select DISTINCT e.nome, e.funcao, e.sal, dep.local
+from emp e,dep,descontos d
+where e.ndep = dep.ndep
+and dep.local='Coimbra'
+and e.sal > 150000
+order by e.sal DESC;
+--//==== Ex 8 ====//--
+select e.nome, e.funcao,d.escalao,dep.nome "DEPARTAMENTO"
+from emp e, descontos d,dep
+where e.ndep = dep.ndep
+and (e.sal BETWEEN d.salinf and d.salsup)
+and not e.funcao = 'Continuo'
+order by d.escalao desc;
+--//==== Ex 9 ====//--
+select e.nome,e.funcao,d.nome "DEPARTAMENTO"
+from emp e,dep d
+where e.ndep (+)= d.ndep
+order by d.nome,e.nome;
+--//==== Ex 10 ====//--
+select e1.nome, e2.nome "Subordinado"
+from emp e1, emp e2
+where e2.encar=e1.nemp
+order by e1.nome, e2.nome;
+--//==== Ex 11 ====//--
+
+--//==== Ex 12 ====//--
+select e.ndep,dep.nome, dep.local
+from emp e,dep
+where e.ndep (+)=dep.ndep
+MINUS
+select e.ndep,dep.nome, dep.local
+from emp e,dep
+where e.ndep =dep.ndep;
+
+--//________ Aula 3 ________//--
+--//==== Ex 1 ====//--
+select UPPER(e.nome), LOWER(e.funcao) "Funcao", INITCAP(d.nome) "DEPARTAMENTO"
+from emp e, dep d
+where e.ndep=d.ndep
+and funcao='Vendedor'
+order by e.nome;
+--//==== Ex 2 ====//--
+select count(*) from emp;
+--//==== Ex 3 ====//-- pag 74
+select count(*) -count(premios) from emp;
+--//==== Ex 4 ====//--
+select count(emp.nemp) "Total Empregados",round(avg(emp.sal),2) "Salario Medio Mensal",sum(emp.sal*12+nvl(emp.premios,0)) "Anual"
+from emp;
+--//==== Ex 5 ====//--
+select nome,funcao,sal,ROUND(sal*1.1355,1) "Salario Com aumento"
+from emp
+where funcao='Continuo';
+--//==== Ex 6 ====//--
+select nome,funcao,sal,round(sal*1.1355,0) "Salario Com aumento"
+from emp
+where funcao='Continuo';
+--//==== Ex 7 ====//--
+select RPAD(CONCAT(CONCAT('>>>> ',nome),' <'),25,'<')
+from emp;
+--//==== Ex 8 ====//--
+SELECT MIN(sal) "Min Sal",MAX(sal) "Max sal",round(AVG(sal),2) "AVG sal"
+FROM emp;
+--//==== Ex 9 ====//--
+select ndep, max(sal)-min(sal)
+from emp
+group by ndep
+order by ndep;
+--//==== Ex 10 ====//--
+select funcao,count(*) " Quantidade"
+from emp
+group by funcao
+order by funcao;
+--//==== Ex 11 ====//--
+select funcao,count(*) " Quantidade"
+from emp
+where funcao = 'Analista' or funcao like '%o'
+group by funcao
+order by funcao;
+--//==== Ex 12 ====//--
+select nvl(encar,0), min(sal)
+from emp
+group by encar
+having min(sal) > 200000
+order by min(sal);
+--//==== Ex 13 ====//--
+select funcao, round(avg(sal))
+from emp
+group by funcao
+having count(*) > 1
+order by 2;
+--//==== Ex 14 ====//--
+select ndep, funcao ,max(sal) "max",min(sal) "min",avg(sal) "med",count(*) "N emp"
+from emp
+where nome != 'Jorge Sampaio'
+group by ndep,funcao
+having max(sal)>=200000
+order by 1,3;
+
+--//________ Aula 4 ________//--
+--//==== Ex 1 ====//-- pag 98
+select min(sal) from emp;
+--//==== Ex 2 ====//--
+select nome,funcao,sal
+from emp
+where sal=(select min(sal) from emp);
+--//==== Ex 3 ====//--
+select nome,funcao,sal
+from emp
+where funcao=(select funcao from emp where nome = 'Olga Costa')
+--//==== Ex 4 ====//--
+select nome, sal ,ndep
+from emp
+where(ndep, sal) IN(select ndep,max(sal) form emp group by ndep)
+order by ndep;
+--//==== Ex 5 ====//--
+select nome,sal,funcao,ndep
+from emp
+where sal > ANY (select sal from emp where ndep=30)
+order by sal desc;
+--//==== Ex 6 ====//--
+select nome, sal, funcao, ndep
+from emp
+where sal > ALL (select sal from emp,dep where emp.ndep=dep.ndep
+  and dep.nome = 'Vendas')
+order by sal desc;
+--//==== Ex 7 ====//--
+select dep.nome, round(avg(emp.sal),2)
+from dep,emp
+where dep.ndep = emp.ndep
+group by dep.nome
+HAVING  round(avg(emp.sal),2) > (select round(avg(sal),2) from emp where ndep= 30)
+--//==== Ex 8 ====//--
+
+--//________ Aula 5 ________//--
+--//==== Ex 1 ====//-- pag120
+Select nemp,nome
+from emp a
+where 2 < (select count(*) from emp where encar=a.nemp);
+--//==== Ex 2 ====//--
+Select e.nemp, e.nome, a.Quantos
+from emp e,(select count(*) Quantos, encar from emp group by encar) a
+where a.Quantos>2 and e.nemp=a.encar;
+--//==== Ex 3a ====//--
+CREATE TABLE emp2
+  (nemp NUMBER(4) CONSTRAINT pk emp PRIMARY KEY,
+  nome VARCHAR2(20) CONSTRAINT nn nome NOT NULL
+  CONSTRAINT upper nome
+  CHECK (nome = UPPER(nome)),
+  funcao VARCHAR2(12),
+  encar NUMBER CONSTRAINT fk encar
+  REFERENCES emp2(nemp),
+  data entrada DATE DEFAULT SYSDATE,
+  sal NUMBER(7) CONSTRAINT ck sal
+  CHECK (sal > 70000),
+  premios NUMBER(7) DEFAULT NULL,
+  ndep NUMBER(2) CONSTRAINT nn ndep NOT NULL
+  CONSTRAINT fk ndep
+  REFERENCES dep(ndep)
+);
+select nome, sal * .1 from emp;
+--//==== Ex 3b ====//--
