@@ -1,18 +1,9 @@
 ALTER TABLE `musica` CHANGE `tempo_da_musica` `tempo_da_musica` TIME NULL DEFAULT NULL;
 ALTER TABLE `membros` CHANGE `mebro_id` `membro_id` BIGINT(20) NOT NULL AUTO_INCREMENT;
+ALTER TABLE album CHANGE ano ano YEAR NULL DEFAULT NULL;
 
-#### Patch Table ####
 ALTER TABLE `album_review` ADD `album_album_id` BIGINT(20) NOT NULL AFTER `data`, ADD INDEX `album_review_fk1` (`album_album_id`) USING BTREE;
 ALTER TABLE `album_review` ADD FOREIGN KEY (`album_album_id`) REFERENCES `album`(`album_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE `album_review` ADD `utilizador_user_id` BIGINT(20) NOT NULL AFTER `album_album_id`, ADD INDEX `album_review_fk2` (`utilizador_user_id`) USING BTREE;
 ALTER TABLE `album_review` ADD FOREIGN KEY (`utilizador_user_id`) REFERENCES `utilizador`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
-
-#### Inserir Uma Musica Numa Playlist ####
-INSERT INTO `playlist_musica` (`playlist_playlist_id`, `musica_musica_id`) VALUES ('8', '19');
-
-
-
-INSERT INTO `musica` (`musica_id`, `nome`, `genero`, `letra`, `musica`, `tempo_da_musica`, `compositor_compositor_id`, `album_album_id`, `autor_autor_id`) VALUES (NULL, 'Joao', 'Pop', NULL, NULL, NULL, '2', NULL, '2');
-INSERT INTO `musica` (`musica_id`, `nome`, `genero`, `letra`, `musica`, `tempo_da_musica`, `compositor_compositor_id`, `album_album_id`, `autor_autor_id`) VALUES (NULL, 'Dirty Deeds Done Dirt Cheap', 'Rock', NULL, NULL, '00:04:11', '1', '4', '1');

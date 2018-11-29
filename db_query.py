@@ -1,12 +1,12 @@
 # Program Name :	Music_for_all database querys
 # Base Language:	MixedEnglish
-# Created by   :	Esmarra
+# Created by   :	
 # Creation Date:	20/11/2018
 # Rework date entries:
 # Program Objectives:
 # Observations:
 # Special Thanks:
-version ="Alfa0.5"
+version ="Beta1.0"
 
 # ==== Imports ===== #
 import pymysql
@@ -116,7 +116,7 @@ def autor_check(autor):
 	else:
 		return(False)
 
-#|---- Insert Author ----|
+#|---- Insert Author ----| Write to db table returns True after valid commit
 def insert_autor(a_nome,a_historia):
 	try:
 		db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
@@ -158,10 +158,40 @@ def list_autor():
 		if db is not None:
 			db.close()
 	return id_map
-arr=list_autor()
-print(arr)
+#arr=list_autor()
+#print(arr)
 
-#|---- Lookup Author ----| é o list autor? 
+#|---- Lookup Author ----|
+def lookup_autor(nome_autor):
+	cnt=0
+	try:
+		db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
+		cursor = db.cursor()
+		sql = """SELECT a.nome,m.nome,a.autor_id
+					FROM autor a, musica m
+					WHERE a.autor_id = m.autor_autor_id
+					AND a.nome='%s'
+				"""%(nome_autor)
+		print("|ID|    Autor    |   Nome\n")
+		#Create Music_ID Array Map
+		id_map=[]
+		cursor.execute(sql)
+		row = cursor.fetchone()
+		while row is not None:
+			cnt += 1
+			print(" %d  %s '%s'"%(cnt,row[0],row[1]))
+			#Append Each Result to Array
+			id_map.append(row[2])
+			row = cursor.fetchone()
+		cursor.close()
+
+	except pymysql.err.OperationalError:
+		print("db error, continue")
+	finally:
+		if db is not None:
+			db.close()
+	return id_map
+#lookup_autor("ACDC")
 
 #|---- Update History ----|
 def update_history(autor_id,historia):
@@ -184,7 +214,7 @@ def update_history(autor_id,historia):
 
 
 ##======== TABELA COMPOSITOR ========## 
-#|---- Check Composer ----|
+#|---- Check Composer ----| returns comp_id(int)
 def composer_check(composer):
 	db = None
 	db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
@@ -197,7 +227,7 @@ def composer_check(composer):
 	else:
 		return(False)
 
-#|---- Insert Composer ----|
+#|---- Insert Composer ----| Write to db table returns True after valid commit
 def insert_comp(c_nome,c_genero,c_birthdate):
 	try:
 		db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
@@ -220,12 +250,15 @@ def list_composer():
 	try:
 		db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
 		cursor = db.cursor()
-		sql = "SELECT nome FROM compositor ORDER BY nome"
+		sql = "SELECT nome,compositor_id FROM compositor ORDER BY nome"
+		#Create Comp_ID Array Map
+		id_map=[]
 		cursor.execute(sql)
 		row = cursor.fetchone()
 		while row is not None:
 			cnt += 1
 			print(" %d - %s "%(cnt,row[0]))
+			id_map.append(row[1])
 			row = cursor.fetchone()
 		cursor.close()
 
@@ -234,13 +267,13 @@ def list_composer():
 	finally:
 		if db is not None:
 			db.close()
-	return
+	return id_map
 #list_composer()
 
 
 
 ##======== TABELA MUSICA ========##
-#|---- Insert Music ----| (flag diz se faz query com album ou sem)
+#|---- Insert Music ----| Write to db table returns True after valid commit (flag diz se faz query com album ou sem) 
 def insert_music(m_nome,m_genero,letra,m_time,c_id,a_id,autor_id,flag):
 	try:
 		db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
@@ -290,14 +323,14 @@ def list_music():
 					AND m.compositor_compositor_id = c.compositor_id
 					ORDER BY m.nome
 				"""	
-		print("|ID|    Nome    |   Autor  |  Compositor |  Genero  |\n")
+		print("  |ID|    Nome    |   Autor  |  Compositor |  Genero  |\n")
 		#Create Music_ID Array Map
 		id_map=[]
 		cursor.execute(sql)
 		row = cursor.fetchone()
 		while row is not None:
 			cnt += 1
-			print(" %d  %s   %s   %s   '%s'"%(cnt,row[0],row[1],row[2],row[3]))
+			print("   %d  %s   %s   %s   '%s'"%(cnt,row[0],row[1],row[2],row[3]))
 			#Append Each Result to Array
 			id_map.append(row[4])
 			row = cursor.fetchone()
@@ -401,7 +434,7 @@ def album_compare(nome_album, album_id):
 	else:
 		return(False)
 
-#|---- Insert Album ----|
+#|---- Insert Album ----| Write to db table returns True after valid commit
 def insert_album(a_nome, a_data, a_editora, a_ano, a_id):
 	try:
 		db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
@@ -420,7 +453,7 @@ def insert_album(a_nome, a_data, a_editora, a_ano, a_id):
 	return value
 #insert_album("Curtian Call","2018-10-01","virgin","2018","6")
 
-#|---- List album ----|
+#|---- List album ----| Displays All Album's / Returns Array with a.id
 def list_album():
 	cnt=0
 	try:
@@ -448,10 +481,43 @@ def list_album():
 #ar=list_album()
 #print(ar)
 
+#|---- Lookup Album ----| Working
+def lookup_album(nome_album,nome_autor):
+	cnt=0
+	try:
+		db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
+		cursor = db.cursor()
+		sql = """SELECT alb.nome,aut.nome,alb.album_id
+					FROM album alb,autor aut
+					WHERE alb.autor_autor_id = aut.autor_id
+					AND alb.nome='%s'
+					AND aut.nome='%s'
+				"""%(nome_album,nome_autor)
+		print("|ID|  Album |   Autor  |\n")
+		#Create Album_ID Array Map
+		id_map=[]
+		cursor.execute(sql)
+		row = cursor.fetchone()
+		while row is not None:
+			cnt += 1
+			print(" %d  %s  '%s'"%(cnt,row[0],row[1]))
+			#Append Each Result to Array
+			id_map.append(row[2])
+			row = cursor.fetchone()
+		cursor.close()
+
+	except pymysql.err.OperationalError:
+		print("db error, continue")
+	finally:
+		if db is not None:
+			db.close()
+	return id_map
+#lookup_album("highway to hell", "ACDC")
+
 
 
 ##======== TABELA ALBUM_REVIEW ========##
-#|----  Insert review ----|
+#|----  Insert review ----| Write to db table returns True after valid commit
 def insert_review(r_review, r_rating,alb_id,user_id):
 	date=time.strftime("%Y-%m-%d", time.localtime())
 	try:
@@ -490,11 +556,26 @@ def update_review(r_id,nova_review,r_rating,alb_id,user_id):
 	return value
 #update_review("1","Ouvi Outra vez é mais ou menos afinal",int("3"),"1","20")
 
+#|----  Check Review ----|
+def check_review(album_id,user_id):
+	db = None
+	db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
+	cursor = db.cursor()
+	#sql="SELECT review_id FROM album_review WHERE album_album_id = '%s' and utilizador_user_id='%s'"%(album_id,user_id)
+	sql="SELECT review_id FROM album_review WHERE album_album_id = '%s' "%(album_id)
+	cursor.execute(sql)
+	result = cursor.fetchone()
+	if(result!=None):
+		return(result[0])
+	else:
+		return(False)
+#print(check_review("6","19"))
+
 
 
 ##======== TABELA PLAYLIST ========##
-#|---- Check playlist ----| [USELESS]
-def playlist_check(nome_playlist):
+#|---- Check playlist ----|
+def check_playlist(nome_playlist):
 	db = None
 	db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
 	cursor = db.cursor()
@@ -506,7 +587,7 @@ def playlist_check(nome_playlist):
 	else:
 		return(False)
 
-#|---- Insert playlist ----|
+#|---- Insert playlist ----| Write to db table returns True after valid commit
 def insert_playlist(pl_nome, pl_privacidade, pl_userid):
 	date=time.strftime("%Y-%m-%d", time.localtime())
 	try:
@@ -526,7 +607,7 @@ def insert_playlist(pl_nome, pl_privacidade, pl_userid):
 	return value
 #insert_playlist("musicas_fofas","1","20")
 
-#|---- List playlist ----|
+#|---- List playlist ----|  Displays All Playlist's / Returns Array with pl.id
 def list_playlist(type,uid):
 	cnt=0
 	try:
@@ -537,8 +618,8 @@ def list_playlist(type,uid):
 			sql = "SELECT nome,data_de_criacao,privacidade,playlist_id FROM playlist WHERE  utilizador_user_id='%s' \
 					ORDER BY data_de_criacao" %(uid)
 			print("|ID|    Nome    |    Data Criaçao |  Publica  |\n")
-		#Disp todas as playlists publicas
-		if(type=="publicas"): 
+		#Disp todas as playlists publicas e as privadas do user
+		if(type=="todas"): 
 			sql = "SELECT p.nome,p.data_de_criacao,u.username,p.playlist_id FROM playlist p,utilizador u \
 				WHERE privacidade=0 AND (u.user_id=utilizador_user_id)"
 			print("|ID|    Nome    |    Data Criaçao |  Criador  |\n")
@@ -564,9 +645,9 @@ def list_playlist(type,uid):
 	finally:
 		if db is not None:
 			db.close()
-	return
+	return id_map
 #arr=list_playlist("user","20")
-#arr=list_playlist("publicas","20")
+#arr=list_playlist("todas","20")
 #print(arr)
 
 #|---- Delete Playlist ----| (pode nao estar 100% correcta)
@@ -590,6 +671,7 @@ def delete_playlist(pl_id,uid):
 
 
 ##======== TABELA PLAYLIST_MUSICA ========##
+#|---- Insert playlist music ----|
 def insert_playlist_music(pl_id,music_id):
 	try:
 		db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
@@ -611,7 +693,7 @@ def insert_playlist_music(pl_id,music_id):
 
 
 ##======== TABELA MEMBROS ========## 
-# Check Membro BUGGED
+#|---- Check Membro ----|
 def membro_check(nome_membro):
 	db = None
 	db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
@@ -682,3 +764,34 @@ def update_concerto(con_id,con_data,sitio,autor_id):
 			db.close()
 	return value
 #update_concerto("1","2018-10-12","Colizeu","2")
+
+#|---- Lookup concerto ----| Working
+def lookup_concerto(nome_autor):
+	cnt=0
+	try:
+		db = pymysql.connect(host=db_ip,user=db_user,password=db_pwd,db=db_name,port=db_port)
+		cursor = db.cursor()
+		sql = """SELECT c.sitio, c.data, c.concerto_id
+					FROM concertos c,autor a
+					WHERE c.autor_autor_id = a.autor_id
+					AND a.nome='%s'
+				"""%(nome_autor)
+		print("|ID|  Sitio|   Data\n")
+		#Create Album_ID Array Map
+		id_map=[]
+		cursor.execute(sql)
+		row = cursor.fetchone()
+		while row is not None:
+			cnt += 1
+			print(" %d  %s  '%s'"%(cnt,row[0],row[1]))
+			#Append Each Result to Array
+			id_map.append(row[2])
+			row = cursor.fetchone()
+		cursor.close()
+
+	except pymysql.err.OperationalError:
+		print("db error, continue")
+	finally:
+		if db is not None:
+			db.close()
+	return id_map

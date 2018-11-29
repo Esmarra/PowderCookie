@@ -1,12 +1,12 @@
 # Program Name :	Music_for_all program
 # Base Language:	MixedEnglish
-# Created by   :	Esmarra
+# Created by   :	
 # Creation Date:	20/11/2018
 # Rework date entries:
 # Program Objectives:
 # Observations:
 # Special Thanks:
-version ="Alfa0.5"
+version ="Beta1.0"
 
 # ==== Imports ===== #
 import os # to use cls
@@ -19,7 +19,7 @@ from db_query import *
 # ==== Global Vars ==== #
 global user
 user=None
-from cookies import * #APAGAR ISTO QUANDO ENVIAR AO PROF
+#from cookies import * #APAGAR NA SUBMISSAO
 
 ####======== Functions ========####
 # Clears Console
@@ -144,21 +144,55 @@ Composer not present in Database
 		c+=1
 		
 	m_nome=input(">Type Music Name: ")
+	#Verifica se já existe esta musica na base de dados
+	if(music_check(m_nome,autor_check(nome_autor))!=False):
+		csl()
+		print(" There is a Music From %s Author with Name = %s Try Again")
+		return
 	m_genero=input(">Type Music Genre: ")
 	letra=input(">Type Music Lyrics: ")
 	m_time=input(">Type Music Time: ")
 	choice=input(">Music has an album?(y/n):")
 	if choice=="y":
-		print("Codigo á espera do Manel")
-		m_album=None
+		nome_album=None
+		c=0;
+		while (album_check(nome_album)==False):
+			if(c!=0):print(" ERROR, Type Album Name Again!")
+			nome_album=input("> Type Album Name: ")
+			if(c>0):
+				print("""
+    Album not present in Database
+    1 - List Album's in Database
+    2 - Try Again
+    3 - Add New Album
+				""")
+				opt=input("> Please select an option: ")
+				if opt=="1":
+					cls()
+					#Listar Album
+					list_album()
+					add_music()
+				elif opt=="2":
+					cls();
+					add_music()
+				elif opt=="3":
+					cls();
+					#Check FO
+				if(add_album()==True):
+					print(" Album Insert Success")
+					add_music()
+				elif opt !="":
+					cls()
+					return
+			c+=1
 		flag='a'
 	elif choice !="":
-		m_album=None
+		nome_album=None
 		flag=''
 	# Upload DB
-	insert_music(m_nome,m_genero,letra,m_time,composer_check(nome_comp),album_check(m_album),autor_check(nome_autor),flag);
+	insert_music(m_nome,m_genero,letra,m_time,composer_check(nome_comp),album_check(nome_album),autor_check(nome_autor),flag);
 	return
-	
+
 #|---- Add Autor ----|
 def add_autor():
 	print(" ==== Add Author ==== ")
@@ -239,7 +273,7 @@ Author not present in Database
 
 	return insert_album(nome_album, album_date, album_editora, ano_album, autor_check(nome_autor))
 
-#|---- Add Review ----| BUG? ver se dá para tentar fazer 2 uploads a review
+#|---- Add Review ----|
 def add_review():	
 	print(" ==== Add Review ==== ")
 	#FK CHECK
@@ -275,6 +309,10 @@ Album not present in Database
 				return
 		c+=1
 
+	#Duplicate Username Review Check
+	if(check_review(album_check(nome_album),check_user(user))!=False):
+		print(" Review Already in database")
+		return
 	review=input("> Type Review: ")
 	rating=input("> Type rating from 1 to 5: ")
 	while (int(rating) < 1 or int(rating) > 5):
@@ -282,13 +320,13 @@ Album not present in Database
 		rating=input("> Type rating from 1 to 5: ")
 	
 	return insert_review(review,int(rating),album_check(nome_album),check_user(user))
+#add_review()
 
-#|---- Add Playlist  ----| BUG falta duplicate check (query user e pl_nome) 
+#|---- Add Playlist  ----|
 def add_playlist():
 	print(" ==== Add Playlist ==== ")
-	#Check Duplicate? pois tá parado Manel...
 	nome_playlist=input("> Type Playlist Name: ")
-	if(playlist_check(nome_playlist)!=False):
+	if(check_playlist(nome_playlist)!=False):
 		print(" Playlist Already in database")
 		return
 	privacidade=input("> Is The Playlist private?(y/n): ")
@@ -395,6 +433,7 @@ Author not present in Database
 	
 	return insert_concerto(sitio_concerto, concerto_date, autor_check(nome_autor))
 
+	
 #|---- Search Music  ----|
 def search_music():
 	global user
@@ -404,49 +443,266 @@ def search_music():
 	nome_autor=input("> Type Author Name: ")
 	#Write Music Id to array ?? OVERKILL
 	music_array=lookup_music(nome_musica,nome_autor)
-	
-	if(array==[]):
+
+	if(music_array==[]):
 		cls()
-		print(" No Match for Search: '%s' Listing All Musics\n"%nome_musica)
+		print(" No Music Match for Name= '%s' & Author = '%s' \n Listing All Musics\n"%nome_musica)
 		list_music()
 		return
+
 	ans=True
 	while ans:
 		try:
 			print("""
 What do you Want to do?
     1 - Add Music to Playlist
-    2 - Search Another Music
-    3 - Back to Main Menu
+	2 - Add Music to Album
+    3 - Search Another Music
+    4 - Back to Main Menu
 			""")
 			ans=input("> Please select an option: ")
 			if ans=="1":
 				#Pergunta Publica ou Privada
 				priv=input("Adicionar a Uma Playlist Publica?(y/n)")
 				if(priv=="y"):
-					pl_array=list_playlist("publicas",check_user(user))
+					pl_array=list_playlist("todas",check_user(user))
 				else:
 					pl_array=list_playlist("user",check_user(user))
+				#print(pl_array)
 				#Verificar se Playlist existe
+				nome_playlist=None
+				c=0;
+				while (check_playlist(nome_playlist)==False):
+					if(c!=0):print(" ERROR, Type Playlist Name Again!")
+					nome_playlist=input("> Type Playlist Name:")
+					if(c>0):
+						print("""
+Playlist not present in Database
+    1 - List Playlist's in Database
+    2 - Try Again
+    3 - Add New Playlist
+						""")
+						opt=input("> Please select an option: ")
+						if opt=="1":
+							cls()
+							#Listar Autores
+							list_playlist("user",check_user(user))
+							search_music()
+						elif opt=="2":
+							cls();
+							search_music()
+						elif opt=="3":
+							cls();
+							#Check FO
+							if(add_playlist()==True):
+								print(" Playlist Insert Success")
+								search_music()
+						elif opt !="":
+							cls()
+							return
+					c+=1
 				
-				
-				#list playlist?
-				#select
-				print("tbd")
+				#Add Music to Playlist
+				insert_playlist_music(pl_array[0],music_array[0])
+				return
 
 			if ans=="2":
 				cls()
+				#|---- Add Music Album  ----|
+				print(" ==== Add_Music_Album ==== ")
+				nome_album=None
+				c=0;
+				while (album_check(nome_album)==False):
+					if(c!=0):print(" ERROR, Type Album Name Again!")
+					nome_album=input("> Type Album Name: ")
+					if(c>0):
+						print("""
+			Album not present in Database
+				1 - List Album's in Database
+				2 - Try Again
+				3 - Add New Album
+						""")
+						opt=input("> Please select an option: ")
+						if opt=="1":
+							cls()
+							#Listar Album
+							list_album()
+							add_review()
+						elif opt=="2":
+							cls();
+							add_review()
+						elif opt=="3":
+							cls();
+							#Check FO
+							if(add_album()==True):
+								print(" Album Insert Success")
+								add_review()
+						elif opt !="":
+							cls()
+							return
+					c+=1
+				
+				update_music_album(music_array[0],autor_check(nome_autor),album_check(nome_album))
+				
+			if ans=="3":
+				cls()
 				search_music()
 
+			if ans=="4":
+				return
+		except KeyboardInterrupt:
+			sys.exit()
+
+#|---- Search autor  ----|
+def search_autor():
+	print(" ==== Search Author ==== ")
+	c=0;
+	nome_autor=input("> Type Author Name: ")
+	a=autor_check(nome_autor)
+		
+	if(a==False):
+		cls()
+		print(" No Match for Search: '%s' Listing All Authors\n"%nome_autor)
+		list_autor()
+		return
+	else: 
+		lookup_autor(nome_autor)
+	ans=True
+	while ans:
+		try:
+			print("""
+What do you Want to do?
+    1 - Add Member to Autor
+    2 - Search Another Author
+    3 - Back to Main Menu
+			""")
+			ans=input("> Please select an option: ")
+			if ans=="1":
+				cls()
+				#Verificar se Autor existe
+				nome_autor=None
+				c=0;
+				while (autor_check(nome_autor)==False):
+					if(c!=0):print(" ERROR, Type Autor Name Again!")
+					nome_autor=input("> Type Autor Name:")
+					if(c>0):
+						print("""
+Author not present in Database
+    1 - List Author's in Database
+    2 - Try Again
+    3 - Add New Author
+						""")
+						opt=input("> Please select an option: ")
+						if opt=="1":
+							cls()
+							#Listar Autores
+							list_autor()
+							search_autor()
+						elif opt=="2":
+							cls();
+							search_autor()
+						elif opt=="3":
+							cls();
+							#Check FO
+							if(add_autor()==True):
+								print(" Author Insert Success")
+								search_autor()
+						elif opt !="":
+							cls()
+							return
+					c+=1
+				
+				#Add Member to Autor
+				nome_membro=input("> Type Membro Name: ")
+				if(membro_check(nome_membro)!=False):
+					print(" Member Already in database")
+					return
+				historia_membro=input("> Type Membros History: ")
+				print("> Type Data de Nascimento do Membro: ")
+				membro_date=input("  Year: ")
+				membro_date+='-'
+				membro_date+=input("  Month: ")
+				membro_date+='-'
+				membro_date+=input("  Day: ")
+				if(insert_membro(nome_membro, historia_membro, membro_date, autor_check(nome_autor))==True):print(" \n Member Successfully Inserted")
+				
+			return
+			if ans=="2":
+				cls()
+				search_autor()
 			if ans=="3":
 				return
 		except KeyboardInterrupt:
 			sys.exit()
-search_music()
+
+#|---- Search Album  ----|
+def search_album():
+	print(" ==== Search album ==== ")
+	c=0;
+	nome_album=input("> Type Album Name: ")
+	nome_autor=input("> Type Album Author Name: ")
+	album_array=lookup_album(nome_album,nome_autor)
+
+	if(album_array==[]):
+		cls()
+		print(" No Album Match for Name= '%s' & Author = '%s' \n Listing All Albums\n"%(nome_album, nome_autor))
+		list_album()
+		return
+	ans=True
+	while ans:
+		try:
+			print("""
+	1 - Add Review to Album
+	2 - Search Another Album
+	3 - Back to Main Menu
+			""")
+			ans=input("> Please select an option: ")
+			if ans=="1":
+				cls()
+				if(add_review()==True):
+					print(" Review Insert Success")
+				user_menu()
+			if ans=="3":
+				cls()
+				search_album()				
+			if ans=="4":
+				cls()
+				return
+		except KeyboardInterrupt:
+			sys.exit()
+
+#|---- Search Concerto  ----|
+def search_concerto():
+	print(" ==== Search Concert ==== ")
+	c=0;
+	nome_autor=input("> Type Concert Author Name: ")
+	a=autor_check(nome_autor)
+	if(a==False):
+		cls()
+		print(" No Match for Search: '%s' \n"%nome_autor)
+		return
+	else: 
+		lookup_concerto(nome_autor)
+	ans=True
+	while ans:
+		try:
+			print("""
+	1 - Search Another Concert
+	2 - Back to Main Menu
+			""")
+			ans=input("> Please select an option: ")
+			if ans=="1":
+				cls()
+				search_concerto()
+			if ans=="2":
+				cls()
+				return			
+		except KeyboardInterrupt:
+			sys.exit()
+
 ##======== MENUS ========##
 def user_menu():
 	global user
-	cls();
 	ans=True
 	while ans:
 		try:
@@ -458,6 +714,18 @@ def user_menu():
 		+------------------+
 		| 2.Search Author  |
 		+------------------+
+		| 3.Search Album   |
+		+------------------+
+		| 4.Search Concert |
+		+------------------+
+		| 5.Make Review    |
+		+------------------+
+		| 6.Create Playlist|
+		+------------------+
+		| 7.View Playlists |
+		+------------------+
+		| 8.Delete Playlist|
+		+------------------+
 		| 0.Logout         |
 		+------------------+
 		| q.Exit           |
@@ -467,25 +735,81 @@ def user_menu():
 			"""%(user,version))
 			ans=input("> Please select an option: ")
 			if ans=="1":
+				cls();
 				search_music()
 				
 			elif ans=="2":
 				cls();
-				#Call Register
-				register();
+				search_autor()
 				
 			elif ans=="3":
 				cls();
-				if user != None:
-					if user_lvl(user)=="editor" or user_lvl(user)=="admin" :
-						#call add music
-						add_music()
-					else:
-						print("You are not an editor")
-
-				else:
-					print("Please Login");
-				# Call Add_Music
+				search_album()
+			
+			elif ans=="4":
+				cls();
+				search_concerto()
+			
+			elif ans=="5":
+				cls();
+				#Fazer Critica
+				add_review()
+			
+			elif ans=="6":
+				cls();
+				#Cria Playlist
+				if(add_playlist()==True):print("\n Playlist Successfully Inserted")
+				#input("Press any key to exit")
+			
+			elif ans=="7":
+				cls();
+				#Ver Playlist
+				list_playlist("todas",check_user(user))
+				#input("Press any key to exit")
+			
+			elif ans=="7":
+				cls();
+				#Ver Playlist
+				list_playlist("todas",check_user(user))
+				#input("Press any key to exit")
+			
+			elif ans=="8":
+				cls();
+				#Delete Playlist
+				#Verificar se Playlist existe
+				nome_playlist=None
+				c=0;
+				while (check_playlist(nome_playlist)==False):
+					if(c!=0):print(" ERROR, Type Playlist Name Again!")
+					nome_playlist=input("> Type Playlist Name:")
+					if(c>0):
+						print("""
+Playlist not present in Database
+    1 - List Playlist's in Database
+    2 - Try Again
+    3 - Add New Playlist
+						""")
+						opt=input("> Please select an option: ")
+						if opt=="1":
+							cls()
+							#Listar Autores
+							list_playlist("user",check_user(user))
+							search_music()
+						elif opt=="2":
+							cls();
+							search_music()
+						elif opt=="3":
+							cls();
+							#Check FO
+							if(add_playlist()==True):
+								print(" Playlist Insert Success")
+								search_music()
+						elif opt !="":
+							cls()
+							return
+					c+=1
+				delete_playlist(check_playlist(nome_playlist),check_user(user))
+				#input("Press any key to exit")
 				
 			elif ans=="0":
 				print("\n Logging you out... Please wait")
@@ -507,48 +831,61 @@ def user_menu():
 
 def editor_menu():
 	global user
-	cls();
 	ans=True
 	while ans:
 		try:
-			print ("""	_______________________________
+			print ("""	_____________________________
 	User: %s
 		 
-		+-------------+
-		| 1.Add Music |
-		+-------------+
-		| 2.Add Author|
-		+-------------+
-		| 0.Logout    |
-		+-------------+
-		| q.Exit      |
-		+-------------+
+		+---------------+
+		| 1.Add Music   |
+		+---------------+
+		| 2.Add Author  |
+		+---------------+
+		| 3.Add Composer|
+		+---------------+
+		| 4.Add ALbum   |
+		+---------------+
+		| 5.Add Concert |
+		+---------------+
+		| 0.Logout      |
+		+---------------+
+		| q.Exit        |
+		+---------------+
 	Version: %s
-	_______________________________
+	_____________________________
 			"""%(user,version))
 			ans=input("> Please select an option: ")
 			if ans=="1":
-				login();
-			
-			#Option -> Register
+				cls()
+				add_music();
+			#Option -> add_music()
 			elif ans=="2":
 				cls();
-				register();
-
-			#Option -> ND
+				add_autor();
+			#Option -> add_autor()
 			elif ans=="3":
+				cls();	
+				add_composer();
+			#Option -> add_composer()
+			elif ans=="4":
+				cls();	
+				add_album();
+			#Option -> add_album()
+			elif ans=="5":
+					cls();	
+					add_concerto();
+			#Option -> add_concerto()
+			elif ans=="q":
 				cls();
-
+				print("\n Goodbye \n")
+				sys.exit()
 			elif ans=="0":
 				print("\n Logging you out... Please wait")
 				time.sleep(1.5) 
 				cls()
 				user=None
 				int_main();
-			elif ans=="q":
-				cls();
-				print("\n Goodbye \n")
-				sys.exit()
 			elif ans !="":
 				cls();
 				print("\n Not Valid Choice Try again")
@@ -579,8 +916,10 @@ def int_main():
 				login();
 				#Read Userlvl from DB
 				if user_lvl(user)=="editor":
+					cls()
 					editor_menu()
 				else :
+					cls()
 					user_menu()
 			elif ans=="2":
 				cls();
@@ -588,8 +927,10 @@ def int_main():
 				#
 				login();
 				if user_lvl(user)=="editor":
+					cls()
 					editor_menu()
 				else :
+					cls()
 					user_menu()
 					
 			elif ans=="q":
@@ -604,5 +945,6 @@ def int_main():
 
 ##========  Test Code Here ========##
 #int_main()
-#user_menu()
+user_menu()
 #search_music()
+#add_music()

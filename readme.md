@@ -9,7 +9,9 @@ Music Streaming and Sharing Service
 ```
 open mysql and import the result from ONDA.com for <bd6_5estrelas.json>
 ```
-* Install python3 ...
+* Install python3
+
+* pip3 install pymysql
 
 * Open db.bat
 
