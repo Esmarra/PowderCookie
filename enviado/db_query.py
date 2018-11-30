@@ -6,7 +6,7 @@
 # Program Objectives:
 # Observations:
 # Special Thanks:
-version ="Beta1.0"
+version ="Beta1.1a"
 
 # ==== Imports ===== #
 import pymysql
@@ -172,7 +172,7 @@ def lookup_autor(nome_autor):
 					WHERE a.autor_id = m.autor_autor_id
 					AND a.nome='%s'
 				"""%(nome_autor)
-		print("|ID|    Autor    |   Musicas\n")
+		print("|ID|    Autor    |   Nome\n")
 		#Create Music_ID Array Map
 		id_map=[]
 		cursor.execute(sql)
@@ -309,7 +309,7 @@ def music_check(nome_music,autor_id):
 		return(result[0])
 	else:
 		return(False)
-#print(music_check("TNT","1"))
+print(music_check("TNT","2"))
 
 #|---- List Music ----| Displays All Music / Returns Array with m.id
 def list_music():
@@ -347,7 +347,6 @@ def list_music():
 
 #|---- Update Letra ----|
 #def update_letra():
-
 
 #|---- Lookup Music ----| Working
 def lookup_music(nome_musica,nome_autor):

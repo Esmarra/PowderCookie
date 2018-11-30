@@ -1,0 +1,11 @@
+Onosso grupo notou um erro no codigo no dia seguinte á entrega,
+falamos com o professor das aulas practicas, que disse que nao tinha problema
+entregar o codigo corrigido na segunda meta, apenas tinhamos de descrever
+num .txt os problemas encontrados e corrigidos.
+
+Apos revisao, verifiquei que:
+	tinhamos um erro(python) numa string -> Patched
+	um return do menu saltava para o errado -> Patched
+	User usando o serch music conseguia adicionar a musica a um album (erro meu) -> Patched só para editores
+	
+	

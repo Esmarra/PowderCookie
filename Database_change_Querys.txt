@@ -7,3 +7,5 @@ ALTER TABLE `album_review` ADD FOREIGN KEY (`album_album_id`) REFERENCES `album`
 
 ALTER TABLE `album_review` ADD `utilizador_user_id` BIGINT(20) NOT NULL AFTER `album_album_id`, ADD INDEX `album_review_fk2` (`utilizador_user_id`) USING BTREE;
 ALTER TABLE `album_review` ADD FOREIGN KEY (`utilizador_user_id`) REFERENCES `utilizador`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `peer_to_peer` ADD `musica_id` INT NOT NULL AFTER `user_id2`, ADD INDEX `fk3` (`musica_id`);
